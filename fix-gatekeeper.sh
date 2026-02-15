@@ -1,5 +1,6 @@
 #!/bin/bash
-# Double-click this file to allow AgentKan to run on macOS without code signing.
+# Removes the macOS quarantine flag from AgentKan so it can be opened.
+# Usage: curl -fsSL https://raw.githubusercontent.com/tencubed/agentkan-release/main/fix-gatekeeper.sh | bash
 
 APP_NAME="AgentKan.app"
 
@@ -9,8 +10,7 @@ APP_PATH=$(mdfind "kMDItemFSName == '$APP_NAME' && kMDItemContentType == 'com.ap
 
 if [ -z "$APP_PATH" ]; then
     echo "Could not find $APP_NAME on this Mac."
-    echo "Press any key to exit."
-    read -n 1
+    echo "Make sure you've installed it first (drag to Applications from the DMG)."
     exit 1
 fi
 
@@ -19,7 +19,4 @@ echo "Removing quarantine flag..."
 
 xattr -cr "$APP_PATH"
 
-echo ""
 echo "Done! You can now open AgentKan normally."
-echo "Press any key to exit."
-read -n 1
