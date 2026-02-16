@@ -4,12 +4,15 @@
 
 APP_NAME="AgentKan.app"
 
-echo "Searching for $APP_NAME..."
+echo "Searching for $APP_NAME in Applications..."
 
-APP_PATH=$(mdfind "kMDItemFSName == '$APP_NAME' && kMDItemContentType == 'com.apple.application-bundle'" | head -1)
-
-if [ -z "$APP_PATH" ]; then
-    echo "Could not find $APP_NAME on this Mac."
+# Check /Applications first, then ~/Applications
+if [ -d "/Applications/$APP_NAME" ]; then
+    APP_PATH="/Applications/$APP_NAME"
+elif [ -d "$HOME/Applications/$APP_NAME" ]; then
+    APP_PATH="$HOME/Applications/$APP_NAME"
+else
+    echo "Could not find $APP_NAME in /Applications or ~/Applications."
     echo "Make sure you've installed it first (drag to Applications from the DMG)."
     exit 1
 fi
@@ -17,6 +20,7 @@ fi
 echo "Found: $APP_PATH"
 echo "Removing quarantine flag..."
 
-xattr -cr "$APP_PATH"
+# Use find to skip broken symlinks (e.g. inside node_modules)
+find "$APP_PATH" -not -type l -exec xattr -c {} + 2>/dev/null
 
 echo "Done! You can now open AgentKan normally."
